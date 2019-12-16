@@ -7,7 +7,9 @@
 		<xsl:call-template name="title" /> 
 	</HEAD>
 	<BODY>
+		<TABLE width="600" border="1">
 			<xsl:apply-templates select="body" />
+		</TABLE>
 	</BODY>
 </HTML>	
 </xsl:template>
@@ -25,7 +27,21 @@
 <xsl:template match="header | nav | article | aside | footer | section | div">
 	 <xsl:choose>
 		<xsl:when test="header | nav | article | aside | footer | section | div">		  
-			<xsl:apply-templates select="header | nav | article | aside | footer | section | div" />	
+			<xsl:choose>
+				<xsl:when test="count(ancestor::header | nav | article | aside | footer | section | div)=1">
+					<TR>         
+						<xsl:apply-templates select="header | nav | article | aside | footer | section | div" />		
+					</TR>
+				</xsl:when>
+				<xsl:when test="count(ancestor::header | nav | article | aside | footer | section | div) &gt; 1">
+					<TD>         
+						<xsl:apply-templates select="header | nav | article | aside | footer | section | div" />
+					</TD>		
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:apply-templates select="header | nav | article | aside | footer | section | div" />
+				</xsl:otherwise>
+			</xsl:choose>	
         </xsl:when>	
         <xsl:otherwise>
 			<xsl:call-template name="explorer" />						 
@@ -37,7 +53,7 @@
 	<xsl:if test="not(./*)">
 		<xsl:value-of select="."/>
 	</xsl:if>
-	<xsl:for-each select=".//*">
+	<xsl:for-each select="./*">
 		<xsl:call-template name="content" />
 	</xsl:for-each>
 </xsl:template>
