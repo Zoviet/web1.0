@@ -1,0 +1,16 @@
+#!/bin/bash
+
+content=${!#};
+urlstatus=$(curl -o /dev/null --silent --head --write-out '%{http_code}' "$content" )		
+if [ $urlstatus -eq 200 ]; then	
+	echo "Starting HTML parse";
+	name=`echo "$content" | sed 's/^.\{6,8\}\/\(.*\)\.\(.*\)$/\1-\2/' | sed 's/[\/\.]/-/g'`;						
+	wget --header="Accept: text/html" --user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:21.0) Gecko/20100101 Firefox/21.0" -q --force-html -O temp $content;	
+	echo 'Starting XSLT transform';
+		# pandoc -p -s --from html  --html-q-tags -o htmltemp --to html --verbose  temp;		
+		xsltproc -o $name.html --novalid --html './../transform.xsl' temp;
+		# rm temp;
+		echo 'XSLT transform done!';	
+else 
+	echo "Error: No valid URL. Http status is: "$urlstatus;
+fi
